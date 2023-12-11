@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUD Operations</title>
+  
+</head>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50%;
+      margin-top: -10px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      width: 200px;
+    }
+    input[type="date"] {
+      padding: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      width: 200px;
+    }
+    input[type="time"] {
+      padding: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      width: 200px;
+    }
+    
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 3px;
+      width: 550px;
+      margin-left: -950px;
+    }
+
+    .edit-inputs {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .edit-inputs input[type="text"],
+    .edit-inputs button {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+  </style>
+<body>
+  <h1>CRUD Operations</h1>
+
+  <!-- Form for creating an item -->
+  <form id="createForm">
+    <h2 style="position: absolute; margin-top: 5px; margin-left: -110px;"> Name</h2>
+    <input type="text" id="nameInput" placeholder="Name"><br/>
+    <h2 style="position: absolute; margin-top: 5px; margin-left: -110px;"> Date</h2>
+    <input id="date" type="date" placeholder="Date"><br/>
+    <h2 style="position: absolute; margin-top: 5px; margin-left: -110px;"> Location</h2>
+    <input type="text" id="descriptionInput" placeholder="Location"><br/>
+    <h2 style="position: absolute; margin-top: 5px; margin-left: -110px;"> In-Time</h2>
+    <input id = "inTime" type="time" placeholder="In-Time"><br/>
+    <h2 style="position: absolute; margin-top: 5px; margin-left: -110px;"> Out-Time</h2>
+    <input type = "time" id="outTIme" placeholder="Out-Time"><br/>
+    
+    
+    <br/>
+    <button  style = "height: 44px; margin-top: 50px;" type="submit">Submit</button>
+  </form>
+
+  
+  <div id="itemsList"></div>
+
+  <script>
+    async function fetchItems() {
+      const response = await fetch('http://localhost:3000/items');
+      const items = await response.json();
+
+      const itemsList = document.getElementById('itemsList');
+      itemsList.innerHTML = '';
+
+      items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('item');
+        itemElement.innerHTML = `
+          <p>${item.name}: ${item.description}</p>
+          <button onclick="editItem('${item._id}', '${item.name}', '${item.description}')">Edit</button>
+          <button onclick="deleteItem('${item._id}')">Delete</button>
+          <div class="edit-inputs">
+            <input type="text" id="editName_${item._id}" placeholder="New Name">
+            <input type="text" id="editDescription_${item._id}" placeholder="New Description">
+            <button onclick="updateItem('${item._id}')">Update</button>
+          </div>
+        `;
+        itemsList.appendChild(itemElement);
+      });
+    }
+
+    async function editItem(id, name, description) {
+      const editInputs = document.querySelectorAll('.edit-inputs');
+      editInputs.forEach(input => {
+        input.style.display = 'none';
+      });
+
+      const editInputsForItem = document.querySelector(`#editName_${id}`).parentNode;
+      editInputsForItem.style.display = 'block';
+
+      document.getElementById(`editName_${id}`).value = name;
+      document.getElementById(`editDescription_${id}`).value = description;
+    }
+
+    async function deleteItem(id) {
+  try {
+    const response = await fetch(`http://localhost:3000/items/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      fetchItems(); // If successful, update the displayed items
+    } else {
+      const errorMessage = await response.text();
+      console.error('Failed to delete item:', errorMessage);
+    }
+  } catch (error) {
+    console.error('Error deleting item:', error);
+  }
+}
+
+    async function updateItem(id) {
+      const newName = document.getElementById(`editName_${id}`).value;
+      const newDescription = document.getElementById(`editDescription_${id}`).value;
+
+      await fetch(`http://localhost:3000/items/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: newName, description: newDescription }),
+      });
+      fetchItems();
+    }
+
+    document.getElementById('createForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('nameInput').value;
+      const description = document.getElementById('descriptionInput').value;
+
+      await fetch('http://localhost:3000/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, description }),
+      });
+      fetchItems();
+    });
+
+    fetchItems();
+  </script>
+</body>
+</html>
