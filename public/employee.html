@@ -87,9 +87,23 @@
   <div id="itemsList"></div>
 
   <script>
-    
+    document.getElementById('createForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-   
+      const name = document.getElementById('nameInput').value;
+      const description = document.getElementById('descriptionInput').value;
+
+      await fetch('http://localhost:3000/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, description }),
+      });
+      fetchItems();
+    });
+
+    fetchItems();
   </script>
 </body>
 </html>
