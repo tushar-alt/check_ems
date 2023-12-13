@@ -17,6 +17,19 @@ const itemSchema = new mongoose.Schema({
   description: String,
 });
 
+const cors = require('cors');
+
+
+// Use CORS middleware
+app.use(cors());
+
+// Define your API endpoints
+app.get('/items', (req, res) => {
+    // Your endpoint logic here
+    res.json({ message: 'This is the response for /items' });
+});
+
+// Start the server
 const Item = mongoose.model('Item', itemSchema);
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -91,7 +104,6 @@ app.delete('/items/:id', async (req, res) => {
       res.status(500).json({ error: 'Error deleting item' });
     }
   });
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
