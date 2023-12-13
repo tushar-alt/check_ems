@@ -6,9 +6,9 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const url = "mongodb+srv://tushar:threat_3D%40%23@cluster0.n3oox4e.mongodb.net/Student";
+const url = "mongodb+srv://threat:threat@cluster0.5jbq9u3.mongodb.net/employee";
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://tushar:threat_3D%40%23@cluster0.n3oox4e.mongodb.net/Student") ;
+mongoose.connect("mongodb+srv://threat:threat@cluster0.5jbq9u3.mongodb.net/employee") ;
 
 app.use(express.static(path.join(__dirname, 'public')));
 // Define a Schema for MongoDB
